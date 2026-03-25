@@ -1,0 +1,5 @@
+[
+  { "pattern": "quantity mismatch", "priority": "Critical" },
+  { "pattern": "Order placement failed", "priority": "High" },
+  { "pattern": "punycode|deprecated", "priority": "Skip" }
+]

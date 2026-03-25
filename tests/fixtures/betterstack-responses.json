@@ -1,0 +1,26 @@
+{
+  "patternQueryResult": [
+    {
+      "_pattern": "Connection timeout in ExitEngine",
+      "cnt": 47,
+      "example_message": "Connection timeout while checking position status for AAPL 250321C00200000",
+      "level": "error",
+      "component": "ExitEngine",
+      "first_seen": "2026-03-20T06:00:00Z",
+      "last_seen": "2026-03-20T13:45:00Z"
+    },
+    {
+      "_pattern": "punycode deprecated warning",
+      "cnt": 12,
+      "example_message": "The `punycode` module is deprecated",
+      "level": "warn",
+      "component": null,
+      "first_seen": "2026-03-20T06:00:00Z",
+      "last_seen": "2026-03-20T13:00:00Z"
+    }
+  ],
+  "rawLogSamples": [
+    "{\"message\":\"Connection timeout while checking position status\",\"level\":\"error\",\"source\":\"ExitEngine\",\"context\":{\"runtime\":{\"file\":\"engine.rs\",\"line\":245}}}",
+    "{\"message\":\"Connection timeout on SSE stream\",\"level\":\"error\",\"source\":\"ExitEngine\"}"
+  ]
+}

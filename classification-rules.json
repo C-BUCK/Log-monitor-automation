@@ -1,0 +1,8 @@
+[
+  { "pattern": "quantity mismatch|manual close failed", "priority": "Critical" },
+  { "pattern": "FILL_GUARD REJECTED|UNEXPECTED 429|Failed to reconnect", "priority": "Critical" },
+  { "pattern": "Order placement failed", "priority": "High" },
+  { "pattern": "connection limit exceeded 406", "priority": "High" },
+  { "pattern": "STUCK|orphan detection", "priority": "Low" },
+  { "pattern": "punycode|deprecated", "priority": "Skip" }
+]

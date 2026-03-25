@@ -1,0 +1,28 @@
+[
+  {
+    "pattern": "Connection timeout in ExitEngine",
+    "service": "backend",
+    "environment": "production",
+    "githubRepo": "acme-org/acme-backend",
+    "occurrenceCount": 47,
+    "exampleMessage": "Connection timeout while checking position status for AAPL 250321C00200000",
+    "level": "error",
+    "component": "ExitEngine",
+    "firstSeen": "2026-03-20T06:00:00Z",
+    "lastSeen": "2026-03-20T13:45:00Z",
+    "rawSamples": ["Connection timeout while checking position status", "Connection timeout on SSE stream"]
+  },
+  {
+    "pattern": "Order placement failed",
+    "service": "backend",
+    "environment": "staging",
+    "githubRepo": "acme-org/acme-backend",
+    "occurrenceCount": 5,
+    "exampleMessage": "Order placement failed: insufficient buying power",
+    "level": "error",
+    "component": "EntryCoordinator",
+    "firstSeen": "2026-03-20T10:00:00Z",
+    "lastSeen": "2026-03-20T12:00:00Z",
+    "rawSamples": ["Order placement failed: insufficient buying power"]
+  }
+]
