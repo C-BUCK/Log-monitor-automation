@@ -32,7 +32,7 @@ export function run(command: string, args: string[], cwd: string, timeoutMs = 60
 export function resetToLatest(repoPath: string, branch: string): void {
   git(repoPath, ["fetch", "origin"]);
   // Unstage + discard all changes so checkout can switch branches cleanly
-  try { git(repoPath, ["reset", "HEAD"]); } catch { /* ignore if no HEAD */ }
+  try { git(repoPath, ["reset", "HEAD"]); } catch (err) { logger.warn("git reset HEAD failed (may be empty repo)", { repoPath, error: String(err) }); }
   git(repoPath, ["checkout", "--", "."]);
   git(repoPath, ["clean", "-fd"]);
   git(repoPath, ["checkout", branch]);
@@ -49,8 +49,8 @@ export function pruneLocalBranches(repoPath: string, prefix: string): void {
     if (name) {
       try {
         git(repoPath, ["branch", "-D", name]);
-      } catch {
-        // Ignore errors deleting branches
+      } catch (err) {
+        logger.warn("Failed to delete local branch", { branch: name, error: String(err) });
       }
     }
   }

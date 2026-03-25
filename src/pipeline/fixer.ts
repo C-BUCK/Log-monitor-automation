@@ -163,7 +163,7 @@ export async function fix(
   } catch (err) {
     logger.error("Fix failed", { pattern: analysis.errorPattern, error: String(err) });
     // Clean up git state so the next fix or analysis starts clean
-    try { resetToLatest(repoPath, targetBranch); } catch { /* best-effort */ }
+    try { resetToLatest(repoPath, targetBranch); } catch (cleanupErr) { logger.warn("Failed to reset git state after fix failure", { error: String(cleanupErr) }); }
     return { outcome: "failed", branch: branchName, failureReason: String(err) };
   }
 }

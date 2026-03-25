@@ -102,7 +102,15 @@ export class BetterStackClient {
       throw new Error(`BetterStack MCP error: ${data.error.message}`);
     }
 
-    const text = data.result?.content?.[0]?.text ?? "[]";
+    const text = data.result?.content?.[0]?.text;
+    if (!text) {
+      logger.warn("BetterStack MCP returned no content — response may be malformed", {
+        tool: toolName,
+        hasResult: !!data.result,
+        contentLength: data.result?.content?.length ?? 0,
+      });
+      throw new Error(`BetterStack MCP returned empty content for tool ${toolName}`);
+    }
     return text;
   }
 

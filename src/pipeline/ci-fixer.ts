@@ -258,7 +258,7 @@ ${failureLog}
           entry.prNumber,
           `## CI Fix Attempt ${entry.ciAttempts}\n\n**Failed step:** ${failedStepName}\n\n**Fix applied:**\n${fixSummary}`,
         );
-      } catch { /* best-effort */ }
+      } catch (err) { logger.warn("Failed to add CI fix comment to PR", { pr: entry.prNumber, error: String(err) }); }
     }
 
     // 6. Poll for CI completion
@@ -288,7 +288,7 @@ ${failureLog}
     try {
       git(repoPath, ["fetch", "origin", entry.branch!]);
       git(repoPath, ["reset", "--hard", `origin/${entry.branch}`]);
-    } catch { /* best effort */ }
+    } catch (err) { logger.warn("Failed to reset to fix branch between CI attempts", { branch: entry.branch, error: String(err) }); }
   }
 
   // Loop exhausted

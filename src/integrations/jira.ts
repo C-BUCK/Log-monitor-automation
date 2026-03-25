@@ -171,21 +171,21 @@ export class JiraClient {
     };
   }
 
-  /** Check whether an issue still exists (returns false on 404 or network error) */
+  /** Check whether an issue still exists. Returns false only on 404. Throws on network/server errors. */
   async issueExists(issueKey: string): Promise<boolean> {
-    try {
-      const url = `${this.baseUrl}/rest/api/3/issue/${issueKey}?fields=status`;
-      const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: this.authHeader,
-          Accept: "application/json",
-        },
-      });
-      return res.ok;
-    } catch {
-      return false;
+    const url = `${this.baseUrl}/rest/api/3/issue/${issueKey}?fields=status`;
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: this.authHeader,
+        Accept: "application/json",
+      },
+    });
+    if (res.status === 404) return false;
+    if (!res.ok) {
+      throw new Error(`Jira issueExists check failed (${res.status}) for ${issueKey}`);
     }
+    return true;
   }
 
   /** Build the browse URL for an issue key */

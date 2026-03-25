@@ -1,6 +1,7 @@
 // src/pipeline/analyzer.ts
 import type { ClassifiedError, AnalysisResult } from "../types.js";
 import type { ClaudeClient } from "../integrations/claude.js";
+import { sanitizeLogSamples } from "../utils/sanitizer.js";
 import { logger } from "../utils/logger.js";
 
 export async function analyze(
@@ -19,7 +20,7 @@ export async function analyze(
 - Example message: ${error.exampleMessage}
 
 ## Raw Log Samples
-${error.rawSamples.map((s, i) => `${i + 1}. ${s}`).join("\n")}
+${sanitizeLogSamples(error.rawSamples).map((s, i) => `${i + 1}. ${s}`).join("\n")}
 
 ## Instructions
 1. Search the codebase for files related to this error (use the component name, error message keywords, etc.)

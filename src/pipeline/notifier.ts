@@ -116,8 +116,11 @@ export async function notify(
   consecutiveFailures: number,
   costAlertThreshold: number,
   slackClient: SlackClient
-): Promise<boolean> {
+): Promise<void> {
   const digest = formatDigest(summary, staleReminders, consecutiveFailures, costAlertThreshold);
   logger.info("Posting digest to Slack", { length: digest.length });
-  return slackClient.postMessage(digest);
+  const ok = await slackClient.postMessage(digest);
+  if (!ok) {
+    throw new Error("Slack notification failed — both API and webhook fallback returned errors");
+  }
 }

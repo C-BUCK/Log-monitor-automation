@@ -525,7 +525,7 @@ export async function runPipeline(config: AppConfig): Promise<RunSummary> {
             ].join("\n");
             try {
               await jiraClient.addComment(leadJob.jiraTicket, comment);
-            } catch { /* best-effort */ }
+            } catch (err) { logger.warn("Failed to add grouping comment to Jira", { ticket: leadJob.jiraTicket, error: String(err) }); }
           }
         }
 
@@ -624,7 +624,7 @@ export async function runPipeline(config: AppConfig): Promise<RunSummary> {
                   entry.jiraTicket,
                   `Automated fix skipped — the bug appears to be already resolved on the ${config.pipeline.targetBranch} branch. No PR needed. Will re-open if the error recurs.`
                 );
-              } catch { /* best-effort */ }
+              } catch (err) { logger.warn("Failed to add already-fixed comment to Jira", { ticket: entry.jiraTicket, error: String(err) }); }
             }
           } else if (fixResult.outcome === "needs-human") {
             entry.ciStatus = "needs-human";
