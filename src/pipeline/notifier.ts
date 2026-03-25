@@ -1,5 +1,5 @@
 // src/pipeline/notifier.ts
-import type { RunSummary } from "../types.js";
+import type { RunSummary, PipelineJob } from "../types.js";
 import type { SlackClient } from "../integrations/slack.js";
 import { logger } from "../utils/logger.js";
 
@@ -10,9 +10,19 @@ const PRIORITY_EMOJI: Record<string, string> = {
   Low: "🟢",
 };
 
+function formatJobLine(job: PipelineJob): string {
+  const emoji = PRIORITY_EMOJI[job.error.priority] || "⚪";
+  const ticket = job.jiraUrl
+    ? `<${job.jiraUrl}|${job.jiraTicket}>`
+    : job.jiraTicket || "pending";
+  const pr = job.prUrl ? `→ PR <${job.prUrl}|#${job.prNumber}>` : "";
+  const status = job.outcome === "needs-human" ? " ⚠️ needs-human" : "";
+  return `  ${emoji} ${job.error.priority} — "${job.error.pattern}" (${job.error.occurrenceCount}x) → ${ticket} ${pr}${status}`;
+}
+
 export function formatDigest(
   summary: RunSummary,
-  staleReminders: Array<{ key: string; jiraTicket: string; daysSinceCreated: number }>,
+  staleReminders: Array<{ key: string; jiraTicket: string; jiraUrl?: string; daysSinceCreated: number }>,
   consecutiveFailures: number,
   costAlertThreshold: number
 ): string {
@@ -48,18 +58,23 @@ export function formatDigest(
     lines.push("✅ All clear — no new errors detected");
     lines.push("");
   } else {
-    // New issues
-    const newJobs = summary.jobs.filter((j) => j.outcome !== "skipped");
+    // Issues — split into newly created vs. existing
+    const activeJobs = summary.jobs.filter((j) => j.outcome !== "skipped");
+    const newJobs = activeJobs.filter((j) => j.ticketCreated !== false);
+    const existingJobs = activeJobs.filter((j) => j.ticketCreated === false);
+
     if (newJobs.length > 0) {
       lines.push("🆕 New Issues:");
       for (const job of newJobs) {
-        const emoji = PRIORITY_EMOJI[job.error.priority] || "⚪";
-        const ticket = job.jiraTicket || "pending";
-        const pr = job.prUrl ? `→ PR ${job.prUrl}` : "";
-        const status = job.outcome === "needs-human" ? " ⚠️ needs-human" : "";
-        lines.push(
-          `  ${emoji} ${job.error.priority} — "${job.error.pattern}" (${job.error.occurrenceCount}x) → ${ticket} ${pr}${status}`
-        );
+        lines.push(formatJobLine(job));
+      }
+      lines.push("");
+    }
+
+    if (existingJobs.length > 0) {
+      lines.push("🔄 Recurring (existing ticket):");
+      for (const job of existingJobs) {
+        lines.push(formatJobLine(job));
       }
       lines.push("");
     }
@@ -88,7 +103,10 @@ export function formatDigest(
   if (staleReminders.length > 0) {
     lines.push("⏰ Stale needs-human reminders:");
     for (const reminder of staleReminders) {
-      lines.push(`  ${reminder.jiraTicket} — open for ${reminder.daysSinceCreated} days`);
+      const ticketLink = reminder.jiraUrl
+        ? `<${reminder.jiraUrl}|${reminder.jiraTicket}>`
+        : reminder.jiraTicket;
+      lines.push(`  ${ticketLink} — open for ${reminder.daysSinceCreated} days`);
     }
     lines.push("");
   }
@@ -112,7 +130,7 @@ export function formatDigest(
 
 export async function notify(
   summary: RunSummary,
-  staleReminders: Array<{ key: string; jiraTicket: string; daysSinceCreated: number }>,
+  staleReminders: Array<{ key: string; jiraTicket: string; jiraUrl?: string; daysSinceCreated: number }>,
   consecutiveFailures: number,
   costAlertThreshold: number,
   slackClient: SlackClient

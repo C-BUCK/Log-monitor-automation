@@ -12,7 +12,7 @@ export interface CiMonitorResult {
   failed: string[];    // pattern keys
   pending: string[];   // pattern keys
   needsHuman: string[];  // newly marked needs-human
-  staleReminders: Array<{ key: string; jiraTicket: string; daysSinceCreated: number }>;
+  staleReminders: Array<{ key: string; jiraTicket: string; jiraUrl?: string; daysSinceCreated: number }>;
   ciFixesAttempted: number;
   ciFixesPushed: number;
 }
@@ -217,6 +217,7 @@ export async function monitorCi(
         result.staleReminders.push({
           key,
           jiraTicket: entry.jiraTicket,
+          jiraUrl: entry.jiraUrl,
           daysSinceCreated: daysSince,
         });
       }

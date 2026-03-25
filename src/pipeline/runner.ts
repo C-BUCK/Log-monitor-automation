@@ -145,6 +145,7 @@ export async function runPipeline(config: AppConfig): Promise<RunSummary> {
   let staleReminders: Array<{
     key: string;
     jiraTicket: string;
+    jiraUrl?: string;
     daysSinceCreated: number;
   }> = [];
 
@@ -301,6 +302,7 @@ export async function runPipeline(config: AppConfig): Promise<RunSummary> {
           logger.info("Skipping analysis — ticket already exists", { key, jiraTicket: existing.jiraTicket });
           job.jiraTicket = existing.jiraTicket;
           job.jiraUrl = existing.jiraUrl;
+          job.ticketCreated = false;
           // Load persisted analysis so grouper can use it
           if (existing.analysis) {
             job.analysis = existing.analysis;
@@ -357,6 +359,7 @@ export async function runPipeline(config: AppConfig): Promise<RunSummary> {
         const ticket = await createTicket(analysis, error.priority, service.jiraProjectKey, jiraClient, envSource?.sourceId, error.exampleMessage);
         job.jiraTicket = ticket.key;
         job.jiraUrl = ticket.url;
+        job.ticketCreated = ticket.created;
 
         // Update state with ticket info
         const updatedState = stateManager.loadErrors();

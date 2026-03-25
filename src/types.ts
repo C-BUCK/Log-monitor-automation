@@ -51,6 +51,7 @@ export interface PipelineJob {
   analysis?: AnalysisResult;
   jiraTicket?: string;
   jiraUrl?: string;
+  ticketCreated?: boolean;
   branch?: string;
   prUrl?: string;
   prNumber?: number;
